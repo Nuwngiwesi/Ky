@@ -1,0 +1,33 @@
+plugins { id 'com.android.application' version '8.5.2' }
+
+android {
+    namespace 'com.lynko.keyboard'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'com.lynko.keyboard'
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+    }
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java { srcDir '.'; include '*.java' }
+            res.srcDir layout.buildDirectory.dir('flatres')
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+
+// folders නැතිව files තියෙන නිසා method.xml එක build වෙද්දී res/xml එකට copy කරනවා
+tasks.register('flatRes', Copy) {
+    from('method.xml') { into 'xml' }
+    into layout.buildDirectory.dir('flatres')
+}
+tasks.matching { it.name == 'preBuild' }.configureEach { dependsOn 'flatRes' }
