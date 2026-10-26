@@ -13,7 +13,7 @@ android {
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
-            java { srcDir '.'; include '*.java' }
+            java.srcDir layout.buildDirectory.dir('flatsrc')
             res.srcDir layout.buildDirectory.dir('flatres')
         }
     }
@@ -25,9 +25,13 @@ android {
 
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
 
-// folders නැතිව files තියෙන නිසා method.xml එක build වෙද්දී res/xml එකට copy කරනවා
+// folders නැතිව files තියෙන නිසා build වෙද්දී හරි තැන්වලට copy කරනවා
+tasks.register('flatSrc', Copy) {
+    from('.') { include '*.java' }
+    into layout.buildDirectory.dir('flatsrc')
+}
 tasks.register('flatRes', Copy) {
     from('method.xml') { into 'xml' }
     into layout.buildDirectory.dir('flatres')
 }
-tasks.matching { it.name == 'preBuild' }.configureEach { dependsOn 'flatRes' }
+tasks.matching { it.name == 'preBuild' }.configureEach { dependsOn 'flatSrc', 'flatRes' }
